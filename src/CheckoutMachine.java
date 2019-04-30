@@ -1,19 +1,39 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class CheckoutMachine {
+class CheckoutMachine {
     private int machineID;
     private ArrayList<Product> items;
     private double subTotal;
     private Inventory inventory;
     private Scanner scan = new Scanner(System.in);
 
-    public CheckoutMachine(int id) {
+    CheckoutMachine(int id, Inventory i) {
         machineID = id;
         items = new ArrayList<>();
+        inventory = i;
     }
 
-    public boolean scanBarcode(String barcode) {
+    void run() {
+        boolean running = true;
+        while(running) {
+            System.out.println("Please scan an item.");
+            String item = scan.next();
+            if (item.equals("MAKE_PAYMENT")) {
+                completePurchase();
+            } else if (item.equals("EXIT_SYS")) {
+                running = false;
+            } else {
+                if(scanBarcode(item)) {
+                    printItems();
+                } else {
+                    System.out.println("Product not scanned. Please try again.");
+                }
+            }
+        }
+    }
+
+    private boolean scanBarcode(String barcode) {
         Product p = inventory.pullItem(barcode);
         if(p == null) {
             return false;
@@ -23,12 +43,21 @@ public class CheckoutMachine {
         return true;
     }
 
+    private void printItems() {
+        for(Product p : items) {
+            System.out.println(p.getName() + " : " + p.getPrice());
+        }
+        System.out.println("Subtotal: £" + subTotal);
+    }
+
     private void completePurchase() {
         System.out.println("Scan card.");
         String[] cardData = scan.next().split(" ");
         boolean response = new CreditCompany(cardData[1]).requestPayment(cardData[0], subTotal);
         if(response) {
             System.out.println("Payment Accepted. Please take your items.");
+            subTotal = 0;
+            items = new ArrayList<>();
         } else {
             System.out.println("Payment Error. Please try again.");
             completePurchase();
@@ -41,17 +70,5 @@ public class CheckoutMachine {
             t += p.getPrice();
         }
         subTotal = t;
-    }
-
-    public int getMachineID() {
-        return machineID;
-    }
-
-    public ArrayList<Product> getItems() {
-        return items;
-    }
-
-    public double getSubTotal() {
-        return subTotal;
     }
 }
