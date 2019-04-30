@@ -2,7 +2,7 @@ import java.util.ArrayList;
 public class CheckoutMachine {
     private int machineID;
     private ArrayList<Product> items;
-    private int subTotal;
+    private double subTotal;
     private Inventory inventory;
 
     public CheckoutMachine(int id) {
@@ -11,7 +11,21 @@ public class CheckoutMachine {
     }
 
     public boolean scanBarcode(String barcode) {
+        Product p = inventory.pullItem(barcode);
+        if(p == null) {
+            return false;
+        }
+        items.add(p);
+        calculateSubTotal();
+        return true;
+    }
 
+    private void calculateSubTotal() {
+        double t = 0;
+        for(Product p : items) {
+            t += p.getPrice();
+        }
+        subTotal = t;
     }
 
     public int getMachineID() {
@@ -22,7 +36,7 @@ public class CheckoutMachine {
         return items;
     }
 
-    public int getSubTotal() {
+    public double getSubTotal() {
         return subTotal;
     }
 }
