@@ -18,9 +18,10 @@ class CheckoutMachine {
         boolean running = true;
         while(running) {
             System.out.println("Please scan an item.");
-            String item = scan.next();
+            String item = scan.nextLine();
             if (item.equals("MAKE_PAYMENT")) {
-                completePurchase();
+                if(items.size() == 0) { System.out.println("No items scanned."); }
+                else { completePurchase(); }
             } else if (item.equals("EXIT_SYS")) {
                 running = false;
             } else {
@@ -52,7 +53,7 @@ class CheckoutMachine {
 
     private void completePurchase() {
         System.out.println("Scan card.");
-        String[] cardData = scan.next().split(" ");
+        String[] cardData = scan.nextLine().split(" ");
         boolean response = new CreditCompany(cardData[1]).requestPayment(cardData[0], subTotal);
         if(response) {
             System.out.println("Payment Accepted. Please take your items.");
